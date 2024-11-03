@@ -1,0 +1,70 @@
+on:
+    github:
+        push:
+            if: ${{ event.git.branch == 'dev' }}
+            init:
+                commit-sha: ${{ event.git.sha }}
+tasks:
+    - key: system-packages
+      run: |
+          sudo apt-get update
+          sudo apt-get install openjdk-17-jdk parallel
+          sudo apt-get clean
+
+    - key: node
+      call: mint/install-node 1.0.10
+      with:
+          node-version: 20.17.0
+
+    - key: suitecloud-sdk
+      use: [node]
+      run: |
+          npm install -g --acceptSuiteCloudSDKLicense @oracle/suitecloud-cli
+
+    - key: code
+      call: mint/git-clone 1.4.0
+      with:
+          repository: git@github.com:ss-brycem/acme.git
+          ref: ${{ init.commit-sha }}
+          ssh-key: ${{ vaults.acme-dev.secrets.SSH_PRIVATE_KEY }}
+
+    - key: auth
+      use: [system-packages, suitecloud-sdk, code]
+      run: |
+          set -euxo pipefail
+
+          PROJECT_DIR="$(pwd)/src"
+          AUTH_DIR=$HOME/auth
+          mkdir -p $AUTH_DIR
+          cd $AUTH_DIR
+
+          echo "${{ vaults.acme-dev.secrets.PRIVATE_KEY }}" > ./private.pem
+
+          # Add a dummy manifest.xml file
+          cat << EOF > manifest.xml
+              <manifest projecttype="ACCOUNTCUSTOMIZATION">
+                  <projectname>DEPLOY</projectname>
+                  <frameworkversion>1.0</frameworkversion>
+              </manifest>
+          EOF
+
+          # Run Auth command
+          suitecloud account:setup:ci \
+              --authid $AUTH_ID \
+              --account $ACCOUNT_ID \
+              --certificateid $CERT_ID \
+              --privatekeypath ./private.pem 
+
+          # Copy project.json to project dir
+          cp $AUTH_DIR/project.json $PROJECT_DIR/project.json
+          cd $PROJECT_DIR/..
+      env:
+          AUTH_ID: DEPLOY
+          ACCOUNT_ID: ${{ vaults.acme-dev.vars.ACCOUNT_ID }}
+          CERT_ID: ${{ vaults.acme-dev.vars.CERT_ID }}
+
+    - key: deploy
+      use: [code, auth]
+      run: |
+          cd src/
+          suitecloud project:deploy
