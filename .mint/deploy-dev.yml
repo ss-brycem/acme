@@ -24,9 +24,9 @@ tasks:
     - key: code
       call: mint/git-clone 1.4.0
       with:
-          repository: git@github.com:ss-brycem/acme.git
+          repository: https://github.com/ss-brycem/acme.git
           ref: ${{ init.commit-sha }}
-          ssh-key: ${{ vaults.acme-dev.secrets.SSH_PRIVATE_KEY }}
+          github-access-token: ${{ github.token }}
 
     - key: auth
       use: [system-packages, suitecloud-sdk, code]
