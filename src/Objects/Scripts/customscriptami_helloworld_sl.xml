@@ -1,0 +1,25 @@
+<suitelet scriptid="customscriptami_helloworld_sl">
+  <description></description>
+  <isinactive>F</isinactive>
+  <name>Hello World Suitelet</name>
+  <notifyadmins>F</notifyadmins>
+  <notifyemails></notifyemails>
+  <notifyowner>T</notifyowner>
+  <notifyuser>F</notifyuser>
+  <scriptfile>[/SuiteScripts/AMI_HelloWorld_Suitelet.js]</scriptfile>
+  <scriptdeployments>
+    <scriptdeployment scriptid="customdeployami_helloworld_sl">
+      <allemployees>F</allemployees>
+      <allpartners>F</allpartners>
+      <allroles>F</allroles>
+      <audslctrole></audslctrole>
+      <eventtype></eventtype>
+      <isdeployed>T</isdeployed>
+      <isonline>F</isonline>
+      <loglevel>ERROR</loglevel>
+      <runasrole></runasrole>
+      <status>RELEASED</status>
+      <title>Hello World Suitelet</title>
+    </scriptdeployment>
+  </scriptdeployments>
+</suitelet>
