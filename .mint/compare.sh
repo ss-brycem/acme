@@ -17,17 +17,17 @@ LAST_DEPLOY=$(git tag | grep ^deploy- | sort -r | head -n 1)
 git diff --name-only --output=$TMP_DIR/changed.txt $LAST_DEPLOY $COMMIT_SHA
 
 # We want to handle Files and Objects separately
-cat $TMP_DIR/changed.txt \
-    | grep -F 'src/FileCabinet' \
-    | tee $TMP_DIR/filecabinet.txt \
-|| true
-cat $TMP_DIR/filecabinet.txt >> $TMP_DIR/check.txt
+cat $TMP_DIR/changed.txt |
+    grep -F 'src/FileCabinet' |
+    tee $TMP_DIR/filecabinet.txt ||
+    true
+cat $TMP_DIR/filecabinet.txt >>$TMP_DIR/check.txt
 
-cat $TMP_DIR/changed.txt \
-    | grep -F 'src/Objects/customscript' \
-    | tee $TMP_DIR/objects.txt \
-|| true
-cat $TMP_DIR/objects.txt >> $TMP_DIR/check.txt
+cat $TMP_DIR/changed.txt |
+    grep -F 'src/Objects/customscript' |
+    tee $TMP_DIR/objects.txt ||
+    true
+cat $TMP_DIR/objects.txt >>$TMP_DIR/check.txt
 
 # If we don't care about the files that have changed, then exit
 if [ $(cat $TMP_DIR/check.txt | wc -l) -eq 0 ]; then
@@ -50,7 +50,6 @@ cat ./objects.txt |
     sed -rn 's/^src\/Objects\/(.*)\.xml$/\1/p' |
     parallel "suitecloud object:import --excludefiles --type ALL --destinationfolder '/Objects' --scriptid {}"
 
-
 cd $GIT_DIR
 
 CONFLICT=0
@@ -60,14 +59,14 @@ while read -r file; do
         NS_FILE="$(echo $file | sed 's/src\///g')"
 
         DIFF=$(
-            git show "$LAST_DEPLOY:$file" \
-            | diff -qZBE "$TMP_DIR/$NS_FILE" - \
-            | wc -l
+            git show "$LAST_DEPLOY:$file" |
+                diff -qZBE "$TMP_DIR/$NS_FILE" - |
+                wc -l
         ) || true
 
         if [ $DIFF -gt 0 ]; then
             echo "Conflict found in $file"
-            echo $file >> $TMP_DIR/conflicts.txt
+            echo $file >>$TMP_DIR/conflicts.txt
             CONFLICT=1
         fi
     else
@@ -77,7 +76,7 @@ while read -r file; do
 done < <(cat $TMP_DIR/check.txt)
 
 if [ $CONFLICT -eq 1 ]; then
-    echo  "Aborting deploy due to conflicts. Please resolve manually."
+    echo "Aborting deploy due to conflicts. Please resolve manually."
     echo ::group:: Conflicts found:
     cat $TMP_DIR/conflicts.txt
     echo ::endgroup::
