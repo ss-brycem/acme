@@ -33,7 +33,7 @@ tasks:
       run: |
           set -euxo pipefail
 
-          PROJECT_DIR="$(pwd)/src"
+          WORKSPACE="$(pwd)"
           AUTH_DIR=$HOME/auth
           mkdir -p $AUTH_DIR
           echo AUTH_DIR > $MINT_ENV/AUTH_DIR
@@ -56,9 +56,7 @@ tasks:
               --certificateid $CERT_ID \
               --privatekeypath ./private.pem 
 
-          # Copy project.json to project dir
-          cp $AUTH_DIR/project.json $PROJECT_DIR/project.json
-          cd $PROJECT_DIR/..
+          cd $WORKSPACE
       env:
           AUTH_ID: DEPLOY
           ACCOUNT_ID: ${{ vaults.acme-dev.vars.ACCOUNT_ID }}
