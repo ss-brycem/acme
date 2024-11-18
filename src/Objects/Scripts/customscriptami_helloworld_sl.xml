@@ -16,7 +16,7 @@
       <eventtype></eventtype>
       <isdeployed>T</isdeployed>
       <isonline>F</isonline>
-      <loglevel>ERROR</loglevel>
+      <loglevel>DEBUG</loglevel>
       <runasrole></runasrole>
       <status>RELEASED</status>
       <title>Hello World Suitelet</title>
