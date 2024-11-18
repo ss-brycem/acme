@@ -1,7 +1,7 @@
 on:
   github:
     push:
-      if: ${{ event.git.branch == 'prod' }}
+      if: ${{ event.git.branch == 'main' }}
       init:
         commit-sha: ${{ event.git.sha }}
 
