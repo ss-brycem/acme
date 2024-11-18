@@ -15,7 +15,7 @@ define([], () => {
             name: 'Content-Type',
             value: 'text/plain',
         });
-        response.write('Hello, World!');
+        response.write('Hello, World, Again!');
     };
 
     return { onRequest };
