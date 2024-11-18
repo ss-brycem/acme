@@ -35,8 +35,9 @@ tasks:
 
       WORKSPACE="$(pwd)"
       AUTH_DIR=$HOME/auth
-      mkdir -p $AUTH_DIR
       echo $AUTH_DIR > $MINT_ENV/AUTH_DIR
+
+      mkdir -p $AUTH_DIR
       cd $AUTH_DIR
 
       echo "${{ vaults.acme-dev.secrets.PRIVATE_KEY }}" > ./private.pem
@@ -65,7 +66,6 @@ tasks:
   - key: deploy
     use: [code, auth]
     run: |
-      echo $AUTH_DIR
       cd src/
       cp $AUTH_DIR/project.json ./project.json
       suitecloud project:deploy
