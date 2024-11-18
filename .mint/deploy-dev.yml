@@ -29,13 +29,14 @@ tasks:
           github-access-token: ${{ github.token }}
 
     - key: auth
-      use: [system-packages, suitecloud-sdk, code]
+      use: [system-packages, suitecloud-sdk]
       run: |
           set -euxo pipefail
 
           PROJECT_DIR="$(pwd)/src"
           AUTH_DIR=$HOME/auth
           mkdir -p $AUTH_DIR
+          echo AUTH_DIR > $MINT_ENV/AUTH_DIR
           cd $AUTH_DIR
 
           echo "${{ vaults.acme-dev.secrets.PRIVATE_KEY }}" > ./private.pem
@@ -67,4 +68,5 @@ tasks:
       use: [code, auth]
       run: |
           cd src/
+          cp $AUTH_DIR/project.json ./project.json
           suitecloud project:deploy
