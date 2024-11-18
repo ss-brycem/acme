@@ -2,7 +2,7 @@
  * @NApiVersion 2.1
  * @NScriptType Suitelet
  */
-define([], () => {
+define(['N/ui/serverWidget'], (serverWidget) => {
     /**
      * Defines the Suitelet script trigger point.
      * @param {Object} scriptContext
@@ -11,11 +11,23 @@ define([], () => {
      * @since 2015.2
      */
     const onRequest = ({ response }) => {
-        response.addHeader({
-            name: 'Content-Type',
-            value: 'text/plain',
+        const form = serverWidget.createForm({
+            title: 'Hello World',
         });
-        response.write('Hello, Everybody!');
+
+        const greetingField = form.addField({
+            id: 'ami_helloworld_greeting',
+            label: 'Greeting',
+            type: serverWidget.FieldType.TEXT,
+        });
+        greetingField.updateDisplayType({
+            displayType: serverWidget.FieldDisplayType.INLINE,
+        });
+        greetingField.defaultValue = 'Hello, Solution Source!';
+
+        response.writePage({
+            pageObject: form,
+        });
     };
 
     return { onRequest };
