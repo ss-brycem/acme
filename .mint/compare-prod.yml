@@ -1,0 +1,92 @@
+## This runs tests and other checks and adds a file compare check for
+## Use before merging to production branch
+
+on:
+  github:
+    pull_request:
+      if: ${{ event.git.branch == 'main' }}
+      init:
+        commit-sha: ${{ event.git.sha }}
+
+tasks:
+  # Setup
+
+  - key: node
+    call: mint/install-node 1.0.10
+    with:
+      node-version: 20.17.0
+
+  - key: suitecloud-sdk
+    use: [node]
+    run: |
+      npm install -g --acceptSuiteCloudSDKLicense @oracle/suitecloud-cli
+
+  - key: code
+    call: mint/git-clone 1.4.0
+    with:
+      repository: https://github.com/ss-brycem/acme.git
+      ref: ${{ init.commit-sha }}
+      github-access-token: ${{ github.token }}
+
+  # Tests
+
+  - key: tests
+    use: [node, code]
+    run: |
+
+  # Compare Steps
+
+  - key: system-packages
+    run: |
+      sudo apt-get update
+      sudo apt-get install openjdk-17-jdk parallel
+      sudo apt-get clean
+
+  - key: suitecloud-sdk
+    use: [node]
+    run: |
+      npm install -g --acceptSuiteCloudSDKLicense @oracle/suitecloud-cli
+
+  - key: auth
+    use: [system-packages, suitecloud-sdk]
+    run: |
+      set -euxo pipefail 
+
+      WORKSPACE="$(pwd)"
+      AUTH_DIR=$HOME/auth
+      echo $AUTH_DIR > $MINT_ENV/AUTH_DIR
+
+      mkdir -p $AUTH_DIR
+      cd $AUTH_DIR
+
+      echo "${{ vaults.acme-prod.secrets.PRIVATE_KEY }}" > ./private.pem
+
+      # Add a dummy manifest.xml file
+      cat << EOF > manifest.xml
+          <manifest projecttype="ACCOUNTCUSTOMIZATION">
+              <projectname>DEPLOY</projectname>
+              <frameworkversion>1.0</frameworkversion>
+          </manifest>
+      EOF
+
+      # Run Auth command
+      suitecloud account:setup:ci \
+          --authid $AUTH_ID \
+          --account $ACCOUNT_ID \
+          --certificateid $CERT_ID \
+          --privatekeypath ./private.pem 
+
+      cd $WORKSPACE
+    env:
+      AUTH_ID: DEPLOY
+      ACCOUNT_ID: ${{ vaults.acme-prod.vars.ACCOUNT_ID }}
+      CERT_ID: ${{ vaults.acme-prod.vars.CERT_ID }}
+
+  - key: compare
+    if: ${{ event.git.branch == 'main' }}
+    use: [code, auth]
+    run: |
+      cp $AUTH_DIR/project.json ./src/project.json
+      ./.mint/compare.sh
+    env:
+      COMMIT_SHA: ${{ init.commit-sha }}

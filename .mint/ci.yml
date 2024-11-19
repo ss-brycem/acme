@@ -1,0 +1,37 @@
+on:
+  github:
+    pull_request:
+      init:
+        commit-sha: ${{ event.git.sha }}
+
+tasks:
+  # Setup
+
+  - key: node
+    call: mint/install-node 1.0.10
+    with:
+      node-version: 20.17.0
+
+  - key: code
+    call: mint/git-clone 1.4.0
+    with:
+      repository: https://github.com/ss-brycem/acme.git
+      ref: ${{ init.commit-sha }}
+      github-access-token: ${{ github.token }}
+
+  - key: install
+    use: [node, code]
+    run: |
+      npm install
+
+  # Tests
+  - key: tests
+    use: install
+    run: |
+      npm run test
+
+  # Eslint
+  - key: lint
+    use: install
+    run: |
+      npm run lint

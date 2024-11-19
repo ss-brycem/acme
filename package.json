@@ -1,8 +1,9 @@
 {
-  "name": "suitecloud-project",
+  "name": "acme-inc",
   "version": "1.0.0",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint ./src/FileCabinet/SuiteScripts/*"
   },
   "devDependencies": {
     "@oracle/suitecloud-unit-testing": "^1.6.0",
