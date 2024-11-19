@@ -28,7 +28,12 @@ tasks:
   - key: tests
     use: install
     run: |
-      npm run test
+      npm run test-ci
+    outputs:
+      - path: jest-out.json
+        options:
+          language: JavaScript
+          framework: Jest
 
   # Eslint
   - key: lint

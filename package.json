@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "test": "jest",
+    "test-ci": "jest --json > jest-out.json",
     "lint": "eslint ./src/FileCabinet/SuiteScripts/*"
   },
   "devDependencies": {
