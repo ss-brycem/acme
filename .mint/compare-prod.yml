@@ -4,7 +4,7 @@
 on:
   github:
     pull_request:
-      if: ${{ event.github.pull_request.base.ref == 'main' }}
+      if: ${{ event.github.pull_request.pull_request.base.ref == 'main' }}
       init:
         git-ref: ${{ event.git.sha }}
 
