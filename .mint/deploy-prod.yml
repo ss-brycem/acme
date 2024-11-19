@@ -3,7 +3,7 @@ on:
     push:
       if: ${{ event.git.branch == 'main' }}
       init:
-        commit-sha: ${{ event.git.sha }}
+        git-ref: ${{ event.git.sha }}
 
 tasks:
   - key: system-packages
@@ -26,7 +26,7 @@ tasks:
     call: mint/git-clone 1.4.0
     with:
       repository: git@github.com:ss-brycem/acme.git
-      ref: ${{ init.commit-sha }}
+      ref: ${{ init.git-ref }}
       ssh-key: ${{ vaults.acme-prod.secrets.SSH_PRIVATE_KEY }}
       preserve-git-dir: true
 
@@ -71,7 +71,7 @@ tasks:
       cp $AUTH_DIR/project.json ./src/project.json
       ./.mint/compare.sh
     env:
-      COMMIT_SHA: ${{ init.commit-sha }}
+      GIT_REF: ${{ init.git-ref }}
 
   - key: deploy
     use: [compare]

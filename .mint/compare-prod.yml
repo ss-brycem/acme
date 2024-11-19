@@ -6,7 +6,7 @@ on:
     pull_request:
       if: ${{ event.git.branch == 'main' }}
       init:
-        commit-sha: ${{ event.git.sha }}
+        git-ref: ${{ event.git.sha }}
 
 tasks:
   # Setup
@@ -25,7 +25,7 @@ tasks:
     call: mint/git-clone 1.4.0
     with:
       repository: https://github.com/ss-brycem/acme.git
-      ref: ${{ init.commit-sha }}
+      ref: ${{ init.git-ref }}
       github-access-token: ${{ github.token }}
 
   # Tests
@@ -89,4 +89,4 @@ tasks:
       cp $AUTH_DIR/project.json ./src/project.json
       ./.mint/compare.sh
     env:
-      COMMIT_SHA: ${{ init.commit-sha }}
+      GIT_REF: ${{ init.git-ref }}

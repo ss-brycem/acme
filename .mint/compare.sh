@@ -4,7 +4,7 @@
 set -euxo pipefail
 
 # Make sure we were given a ref to compare
-if [ -z "$COMMIT_SHA" ]; then
+if [ -z "$GIT_REF" ]; then
     echo "I need a commit to compare against!"
     exit 1
 fi
@@ -14,7 +14,7 @@ TMP_DIR=$(mktemp -d)
 
 # Find out what changed
 LAST_DEPLOY=$(git tag | grep ^deploy- | sort -r | head -n 1)
-git diff --name-only --output=$TMP_DIR/changed.txt $LAST_DEPLOY $COMMIT_SHA
+git diff --name-only --output=$TMP_DIR/changed.txt $LAST_DEPLOY $GIT_REF
 
 # We want to handle Files and Objects separately
 cat $TMP_DIR/changed.txt |
@@ -34,7 +34,7 @@ if [ $(cat $TMP_DIR/check.txt | wc -l) -eq 0 ]; then
     echo "No deployable files changed."
     exit 0
 else
-    echo "Comparing files changed in $COMMIT_SHA..."
+    echo "Comparing files changed in $GIT_REF..."
 fi
 
 cp src/manifest.xml $TMP_DIR/manifest.xml

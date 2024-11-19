@@ -3,7 +3,7 @@ on:
     push:
       if: ${{ event.git.branch == 'dev' }}
       init:
-        commit-sha: ${{ event.git.sha }}
+        git-ref: ${{ event.git.sha }}
 tasks:
   - key: system-packages
     run: |
@@ -25,7 +25,7 @@ tasks:
     call: mint/git-clone 1.4.0
     with:
       repository: https://github.com/ss-brycem/acme.git
-      ref: ${{ init.commit-sha }}
+      ref: ${{ init.git-ref }}
       github-access-token: ${{ github.token }}
 
   - key: auth
