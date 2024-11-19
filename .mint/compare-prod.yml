@@ -9,7 +9,11 @@ on:
         git-ref: ${{ event.git.sha }}
 
 tasks:
-  # Setup
+  - key: system-packages
+    run: |
+      sudo apt-get update
+      sudo apt-get install openjdk-17-jdk parallel
+      sudo apt-get clean
 
   - key: node
     call: mint/install-node 1.0.10
@@ -27,25 +31,6 @@ tasks:
       repository: https://github.com/ss-brycem/acme.git
       ref: ${{ init.git-ref }}
       github-access-token: ${{ github.token }}
-
-  # Tests
-
-  - key: tests
-    use: [node, code]
-    run: |
-
-  # Compare Steps
-
-  - key: system-packages
-    run: |
-      sudo apt-get update
-      sudo apt-get install openjdk-17-jdk parallel
-      sudo apt-get clean
-
-  - key: suitecloud-sdk
-    use: [node]
-    run: |
-      npm install -g --acceptSuiteCloudSDKLicense @oracle/suitecloud-cli
 
   - key: auth
     use: [system-packages, suitecloud-sdk]
