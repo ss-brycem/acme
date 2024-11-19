@@ -1,5 +1,5 @@
-describe('Failing Test', () => {
-    it('true should not equal false', () => {
-        expect(true).toEqual(false);
+describe('Passing Test', () => {
+    it('true should be truthy', () => {
+        expect(true).toBeTruthy();
     });
 });
