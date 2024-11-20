@@ -30,6 +30,12 @@ define(['N/ui/serverWidget', 'N/query', 'N/file', 'N/https'], (
         const fileId = parseInt(fileMeta.id);
         const fileUrl = fileMeta.url;
 
+        const file_ = file.load({ id: fileId });
+        file_.isOnline = false;
+        file_.save();
+
+        const fileResponse = https.get({ url: fileUrl });
+
         const form = serverWidget.createForm({
             title: 'Testing File Stuff',
         });
@@ -43,12 +49,8 @@ define(['N/ui/serverWidget', 'N/query', 'N/file', 'N/https'], (
             <p>File previously available without login: ${availableWithoutLogin}</p>
             <p>File ID: ${fileId}</p>
             <p>Download Link: <a href="${fileUrl}">${fileUrl}</a>
+            <pre>${JSON.stringify(fileResponse, null, 4)}</pre>
         `;
-
-        const file_ = file.load({ id: fileId });
-        file_.isOnline = true;
-        file_.save();
-
         response.writePage({
             pageObject: form,
         });
