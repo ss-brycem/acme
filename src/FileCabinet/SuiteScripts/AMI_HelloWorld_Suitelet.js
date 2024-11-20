@@ -31,12 +31,15 @@ define(['N/ui/serverWidget', 'N/query', 'N/file', 'N/https'], (
         const fileUrl = fileMeta.url;
 
         const file_ = file.load({ id: fileId });
-        file_.isOnline = false;
+        file_.isOnline = true;
         file_.save();
 
         const fileResponse = https.get({
             url: 'https://td2961289.app.netsuite.com' + fileUrl,
         });
+
+        file_.isOnline = false;
+        file_.save();
 
         const form = serverWidget.createForm({
             title: 'Testing File Stuff',
