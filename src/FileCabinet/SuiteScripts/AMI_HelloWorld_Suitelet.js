@@ -1,8 +1,9 @@
 /**
  * @NApiVersion 2.1
  * @NScriptType Suitelet
+ * @format
  */
-define(['N/ui/serverWidget'], (serverWidget) => {
+define(['N/ui/serverWidget', 'N/query'], (serverWidget, query) => {
     /**
      * Defines the Suitelet script trigger point.
      * @param {Object} scriptContext
@@ -11,19 +12,33 @@ define(['N/ui/serverWidget'], (serverWidget) => {
      * @since 2015.2
      */
     const onRequest = ({ response }) => {
+        const fileMeta = query
+            .runSuiteQL({
+                query: `
+                    SELECT file.url, file.isonline, file.id
+                    FROM file
+                    WHERE file.id = 2491`,
+            })
+            .asMappedResults()[0];
+
+        const availableWithoutLogin = fileMeta.isonline === 'T';
+        const fileId = fileMeta.id;
+        const fileUrl = fileMeta.url;
+
         const form = serverWidget.createForm({
-            title: 'Hello World',
+            title: 'Testing File Stuff',
         });
 
         const greetingField = form.addField({
-            id: 'ami_helloworld_greeting',
-            label: 'Greeting',
-            type: serverWidget.FieldType.TEXT,
+            id: 'ami_fileinfo',
+            label: 'Content',
+            type: serverWidget.FieldType.INLINEHTML,
         });
-        greetingField.updateDisplayType({
-            displayType: serverWidget.FieldDisplayType.INLINE,
-        });
-        greetingField.defaultValue = 'Hello, Solution Source!';
+        greetingField.defaultValue = `
+            <p>File available without login: ${availableWithoutLogin}</p>
+            <p>File ID: ${fileId}</p>
+            <p>Download Link: <a href="${fileUrl}">${fileUrl}</a>
+        `;
 
         response.writePage({
             pageObject: form,
