@@ -68,7 +68,6 @@ tasks:
       CERT_ID: ${{ vaults.acme-prod.vars.CERT_ID }}
 
   - key: compare
-    if: ${{ event.git.branch == 'main' }}
     use: [code, auth]
     run: |
       cp $AUTH_DIR/project.json ./src/project.json
