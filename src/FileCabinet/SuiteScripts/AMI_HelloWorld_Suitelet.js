@@ -3,7 +3,12 @@
  * @NScriptType Suitelet
  * @format
  */
-define(['N/ui/serverWidget', 'N/query'], (serverWidget, query) => {
+define(['N/ui/serverWidget', 'N/query', 'N/file', 'N/https'], (
+    serverWidget,
+    query,
+    file,
+    https,
+) => {
     /**
      * Defines the Suitelet script trigger point.
      * @param {Object} scriptContext
@@ -22,7 +27,7 @@ define(['N/ui/serverWidget', 'N/query'], (serverWidget, query) => {
             .asMappedResults()[0];
 
         const availableWithoutLogin = fileMeta.isonline === 'T';
-        const fileId = fileMeta.id;
+        const fileId = parseInt(fileMeta.id);
         const fileUrl = fileMeta.url;
 
         const form = serverWidget.createForm({
@@ -35,10 +40,14 @@ define(['N/ui/serverWidget', 'N/query'], (serverWidget, query) => {
             type: serverWidget.FieldType.INLINEHTML,
         });
         greetingField.defaultValue = `
-            <p>File available without login: ${availableWithoutLogin}</p>
+            <p>File previously available without login: ${availableWithoutLogin}</p>
             <p>File ID: ${fileId}</p>
             <p>Download Link: <a href="${fileUrl}">${fileUrl}</a>
         `;
+
+        const file_ = file.load({ id: fileId });
+        file_.isOnline = true;
+        file_.save();
 
         response.writePage({
             pageObject: form,
