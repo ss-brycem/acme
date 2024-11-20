@@ -34,7 +34,9 @@ define(['N/ui/serverWidget', 'N/query', 'N/file', 'N/https'], (
         file_.isOnline = false;
         file_.save();
 
-        const fileResponse = https.get({ url: fileUrl });
+        const fileResponse = https.get({
+            url: 'https://td2961289.app.netsuite.com' + fileUrl,
+        });
 
         const form = serverWidget.createForm({
             title: 'Testing File Stuff',
