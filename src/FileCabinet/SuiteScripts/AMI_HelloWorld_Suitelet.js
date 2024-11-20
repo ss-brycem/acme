@@ -54,7 +54,11 @@ define(['N/ui/serverWidget', 'N/query', 'N/file', 'N/https'], (
             <p>File previously available without login: ${availableWithoutLogin}</p>
             <p>File ID: ${fileId}</p>
             <p>Download Link: <a href="${fileUrl}">${fileUrl}</a>
-            <pre>${JSON.stringify(fileResponse, null, 4)}</pre>
+            <pre>${JSON.stringify(
+                { ...fileResponse, body: 'elided' },
+                null,
+                4,
+            )}</pre>
         `;
         response.writePage({
             pageObject: form,
